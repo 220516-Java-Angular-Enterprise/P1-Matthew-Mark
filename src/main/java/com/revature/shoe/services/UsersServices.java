@@ -19,7 +19,7 @@ public class UsersServices {
 
     public Users register(NewUserRequest request){
         //todo implement NewUserRequest
-        Users users = null;//request.extractUser();
+        Users users = request.extractUsers();
         if(isNotDuplicate(users.getUsername())){
             if(isValidUsername(users.getUsername())){
                 if(isValidPassword(users.getPassword())){
