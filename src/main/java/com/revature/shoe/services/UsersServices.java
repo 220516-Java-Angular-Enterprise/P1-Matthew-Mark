@@ -6,6 +6,7 @@ import com.revature.shoe.models.Users;
 import com.revature.shoe.util.annotations.Inject;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class UsersServices {
     @Inject
@@ -23,7 +24,7 @@ public class UsersServices {
             if(isValidUsername(users.getUsername())){
                 if(isValidPassword(users.getPassword())){
                     users.setUserID(UUID.randomUUID().toString());
-                    //usersDAO.save(users);
+                    usersDAO.save(users);
                 }
             }
         }
@@ -39,6 +40,6 @@ public class UsersServices {
     }
 
     private boolean isNotDuplicate(String username){
-        //return !usersDAO.InsertDaoHere.contains(username);
+        return !usersDAO.getAll().stream().map(users -> users.getUsername()).collect(Collectors.toList()).contains(username);
     }
 }
