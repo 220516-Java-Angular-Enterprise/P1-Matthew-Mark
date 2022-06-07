@@ -2,6 +2,9 @@ package com.revature.shoe.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.revature.shoe.daos.UsersDAO;
+import com.revature.shoe.services.UsersServices;
+import com.revature.shoe.servlets.UsersServlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -16,11 +19,11 @@ public class ContextLoaderListener implements ServletContextListener {
         ObjectMapper mapper = new ObjectMapper();
 
         /* Dependency injection. */
-        //UserServlet userServlet = new UserServlet(mapper, new UserService(new UserDAO()));
+        UsersServlet userServlet = new UsersServlet(mapper, new UsersServices(new UsersDAO()));
 
         /* Need ServletContext class to map whatever servlet to url path. */
         ServletContext context = sce.getServletContext();
-        //context.addServlet("UserServlet", userServlet).addMapping("/users/*");
+        context.addServlet("UsersServlet", userServlet).addMapping("/users/*");
     }
 
     @Override
