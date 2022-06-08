@@ -6,18 +6,15 @@ import com.revature.shoe.models.UsersRole;
 public class NewUserRequest {
     private String username;
     private String password;
-    //todo implement usersRole
-    private UsersRole usersRole;
+    private final UsersRole usersRole = new UsersRole("1", "DEFAULT");
 
     public NewUserRequest() {
         super();
     }
 
-    public NewUserRequest(String username, String password) {
+    public NewUserRequest(String username, String password,UsersRole usersRole) {
         this.username = username;
         this.password = password;
-        this.usersRole = new UsersRole();
-        usersRole.setRoleName("DEFAULT");
     }
 
     public String getUsername() {
@@ -37,6 +34,15 @@ public class NewUserRequest {
     }
 
     public Users extractUsers(){
-        return new Users(username, password, usersRole);
+        Users users = new Users(username, password);
+        users.setUsersRole(usersRole);
+        return users; }
+
+    @Override
+    public String toString() {
+        return "NewUserRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

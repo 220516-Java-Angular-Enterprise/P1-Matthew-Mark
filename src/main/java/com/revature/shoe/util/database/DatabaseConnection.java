@@ -2,6 +2,8 @@ package com.revature.shoe.util.database;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -21,7 +23,11 @@ public class DatabaseConnection {
             Class.forName("org.postgresql.Driver");
 
             /* using prop object to load url, username, password */
-            prop.load(new FileReader("src/main/resources/db.properties"));
+            //Path current = Paths.get("src/main/resources/db.properties");
+            //String s = current.toAbsolutePath().toString();
+            //todo set up catalan variable
+            System.out.println("Current Working Dir: " + System.getProperty("user.dir"));
+            prop.load(new FileReader("D:/Git/Revature/P1-Matthew-Mark/src/main/resources/db.properties"));
 
             /* actually getting this connection */
             con = DriverManager.getConnection(prop.getProperty("url"), prop.getProperty("username"), prop.getProperty("password"));

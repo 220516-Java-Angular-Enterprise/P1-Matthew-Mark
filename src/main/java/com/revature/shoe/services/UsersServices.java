@@ -4,6 +4,8 @@ import com.revature.shoe.daos.UsersDAO;
 import com.revature.shoe.dtos.requests.NewUserRequest;
 import com.revature.shoe.models.Users;
 import com.revature.shoe.util.annotations.Inject;
+import com.revature.shoe.util.custom_exceptions.InvalidRequestException;
+import com.revature.shoe.util.custom_exceptions.ResourceConflictException;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,9 +27,9 @@ public class UsersServices {
                 if(isValidPassword(users.getPassword())){
                     users.setUserID(UUID.randomUUID().toString());
                     usersDAO.save(users);
-                }
-            }
-        }
+                } else throw new InvalidRequestException();
+            } else throw new InvalidRequestException();
+        } else throw new ResourceConflictException();
         return users;
     }
 
