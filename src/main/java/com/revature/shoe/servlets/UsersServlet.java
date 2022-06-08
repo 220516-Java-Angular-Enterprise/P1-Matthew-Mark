@@ -42,4 +42,9 @@ public class UsersServlet extends HttpServlet {
             resp.setStatus(500);
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+        resp.getWriter().write("<h1>User Works!</h1>");
+    }
 }
