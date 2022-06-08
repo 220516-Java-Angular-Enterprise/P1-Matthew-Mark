@@ -28,4 +28,4 @@ hs_err_pid*
 
 *.idea/
 *out/
-src/main/resources/db.properties
+db.properties
