@@ -1,5 +1,7 @@
 D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\dtos\requests\NewUserRequest.java
+D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\util\JwtConfig.java
 D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\services\ReimbursementsService.java
+D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\services\TokenService.java
 D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\util\custom_exceptions\InvalidRequestException.java
 D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\util\database\DatabaseConnection.java
 D:\Git\Revature\P1-Matthew-Mark\src\main\java\com\revature\shoe\dtos\responses\Principal.java

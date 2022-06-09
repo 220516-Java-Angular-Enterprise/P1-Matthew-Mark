@@ -3,6 +3,7 @@ package com.revature.shoe.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.shoe.dtos.requests.LoginRequest;
 import com.revature.shoe.dtos.responses.Principal;
+import com.revature.shoe.services.TokenService;
 import com.revature.shoe.services.UsersServices;
 import com.revature.shoe.util.annotations.Inject;
 import com.revature.shoe.util.custom_exceptions.AuthenticationException;
@@ -19,10 +20,12 @@ public class AuthServlet extends HttpServlet {
     @Inject
     private final ObjectMapper objectMapper;
     private final UsersServices usersServices;
+    private final TokenService tokenService;
 
-    public AuthServlet(ObjectMapper objectMapper, UsersServices usersServices) {
+    public AuthServlet(ObjectMapper objectMapper, UsersServices usersServices, TokenService tokenService) {
         this.objectMapper = objectMapper;
         this.usersServices = usersServices;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -30,6 +33,9 @@ public class AuthServlet extends HttpServlet {
         try {
             LoginRequest loginRequest = objectMapper.readValue(req.getInputStream(), LoginRequest.class);
             Principal principal = new Principal(usersServices.login(loginRequest));
+
+            String token = tokenService.generateToken(principal);
+            resp.setHeader("Authorization", token);
             resp.setStatus(200);
             resp.setContentType("application/json");
             resp.getWriter().write(objectMapper.writeValueAsString(principal));
