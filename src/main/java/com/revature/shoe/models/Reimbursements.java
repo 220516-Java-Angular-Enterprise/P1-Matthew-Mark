@@ -3,11 +3,14 @@ package com.revature.shoe.models;
 import java.sql.Timestamp;
 
 public class Reimbursements {
+    private byte[] receipt;
     private String reimbID;
     private int amount;
     private Timestamp submitted;
     private Timestamp resolved;
     private String description;
+
+    private String paymentID;
     //todo find out how to store images in java with bytea?
     //private TYPEHERE receipt
 
@@ -21,12 +24,25 @@ public class Reimbursements {
 
     }
 
-    public Reimbursements(String reimbID, int amount, Timestamp submitted, Timestamp resolved, String description, Users author, Users resolver, ReimbursementsStatus reimbursementsStatus, ReimbursementsTypes reimbursementsTypes) {
+    public String getPaymentID() {
+        return paymentID;
+    }
+
+    public void setPaymentID(String paymentID) {
+        this.paymentID = paymentID;
+    }
+
+    public Reimbursements(String reimbID, int amount, Timestamp submitted, Timestamp resolved,
+                          String description, byte[] receipt, String paymentID, Users author, Users resolver,
+                          ReimbursementsStatus reimbursementsStatus,
+                          ReimbursementsTypes reimbursementsTypes) {
         this.reimbID = reimbID;
         this.amount = amount;
         this.submitted = submitted;
         this.resolved = resolved;
         this.description = description;
+        this.receipt = receipt;
+        this.paymentID = paymentID;
         this.author = author;
         this.resolver = resolver;
         this.reimbursementsStatus = reimbursementsStatus;
@@ -83,6 +99,14 @@ public class Reimbursements {
 
     public Users getResolver() {
         return resolver;
+    }
+
+    public byte[] getReceipt() {
+        return receipt; // todo: review with matt what we're doing here, returning an array of bytes
+    }
+
+    public void setReceipt(byte[] receipt) {
+        this.receipt = receipt;
     }
 
     public void setResolver(Users resolver) {
