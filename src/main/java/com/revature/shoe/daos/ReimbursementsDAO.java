@@ -30,7 +30,7 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             ps.setBytes(6, obj.getReceipt());
             ps.setString(7, obj.getPaymentID());
             ps.setString(8, obj.getAuthor().getUserID());
-            ps.setString(9, obj.getAuthor().getGivenName()); // todo: do we want to add resolverid?
+            ps.setString(9, obj.getResolver().getUserID());
             ps.setString(10, obj.getReimbursementsStatus().getStatusID());
             ps.setString(11, obj.getReimbursementsTypes().getTypeID());
             ps.executeUpdate();
@@ -55,7 +55,7 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             ps.setBytes(6, obj.getReceipt());
             ps.setString(7,obj.getPaymentID());
             ps.setString(8, obj.getAuthor().getUserID());
-            ps.setString(9, obj.getAuthor().getUserID());
+            ps.setString(9, obj.getResolver().getUserID());
             ps.setString(10, obj.getReimbursementsStatus().getStatusID());
             ps.setString(11, obj.getReimbursementsTypes().getTypeID());
         } catch (SQLException e) {
