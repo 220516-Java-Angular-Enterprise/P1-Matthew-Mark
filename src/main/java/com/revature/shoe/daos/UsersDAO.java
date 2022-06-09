@@ -1,6 +1,7 @@
 package com.revature.shoe.daos;
 
 import com.revature.shoe.models.Users;
+import com.revature.shoe.models.UsersRole;
 import com.revature.shoe.util.database.DatabaseConnection;
 
 import java.sql.Connection;
@@ -99,7 +100,7 @@ public class UsersDAO implements CrudDAO<Users>{
         List<Users> users = new ArrayList<>();
         //This will not work with the current database schema, because it does not have a surname column (as of 06/05)
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id ");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Users user = new Users();
@@ -140,6 +141,36 @@ public class UsersDAO implements CrudDAO<Users>{
             //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public Users getUsersByNamePassword(String username, String password){
+        Users user = null;
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ? AND password = ?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                user = new Users();
+                user.setUserID(rs.getString("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setGivenName(rs.getString("given_name"));
+                user.setSurName(rs.getString("surname"));
+                user.setActive(rs.getBoolean("is_active"));
+
+                //Sets user's UserRole object
+                UsersRole usersRole= new UsersRole();
+                usersRole.setRoleID(rs.getString("role_id"));
+                usersRole.setRoleName(rs.getString("role_name"));
+                user.setUsersRole(usersRole);
+            }
+        } catch (SQLException e) {
+            //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
+            throw new RuntimeException(e.getMessage());
+        }
+        return user;
     }
 
 }

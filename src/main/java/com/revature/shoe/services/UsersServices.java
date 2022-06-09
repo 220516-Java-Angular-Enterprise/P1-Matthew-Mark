@@ -1,9 +1,12 @@
 package com.revature.shoe.services;
 
 import com.revature.shoe.daos.UsersDAO;
+import com.revature.shoe.dtos.requests.LoginRequest;
 import com.revature.shoe.dtos.requests.NewUserRequest;
+import com.revature.shoe.dtos.responses.Principal;
 import com.revature.shoe.models.Users;
 import com.revature.shoe.util.annotations.Inject;
+import com.revature.shoe.util.custom_exceptions.AuthenticationException;
 import com.revature.shoe.util.custom_exceptions.InvalidRequestException;
 import com.revature.shoe.util.custom_exceptions.ResourceConflictException;
 
@@ -17,6 +20,14 @@ public class UsersServices {
     @Inject
     public UsersServices(UsersDAO usersDAO){
         this.usersDAO = usersDAO;
+    }
+
+
+    public Users login(LoginRequest request){
+        if(!isValidUsername(request.getUsername()) || !isValidPassword(request.getPassword())) throw new InvalidRequestException("Invalid username or password");
+        Users users = usersDAO.getUsersByNamePassword(request.getUsername(), request.getPassword());
+        if(users == null) throw new AuthenticationException("Invalid credentials");
+        return users;
     }
 
     public Users register(NewUserRequest request){
