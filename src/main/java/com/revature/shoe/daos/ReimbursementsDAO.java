@@ -20,7 +20,8 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
     @Override
     public void save(Reimbursements obj) {
         try{
-        PreparedStatement ps = con.prepareStatement("INSERT INTO ers_reimbursements (reimb_id, amount, submitted, resolved, description, receipt, payment_id, author_id, resolver_id, " +
+        PreparedStatement ps = con.prepareStatement("INSERT INTO ers_reimbursements (reimb_id, amount, submitted, resolved, description," +
+                "receipt, payment_id, author_id, resolver_id, " +
                 "status_id, type_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             ps.setString(1, obj.getReimbID());
             ps.setInt(2,obj.getAmount());
@@ -44,20 +45,22 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
     public void update(Reimbursements obj) {
         // updates by reimbursement id
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT UPDATE ers_reimbursements SET reimb_id = ?, amount = ?, " +
-                    "submitted = ?, resolved = ?, description = ? , receipt = ?, payment_id = ?, author_id, resolver_id = ?, " +
+            PreparedStatement ps = con.prepareStatement("UPDATE ers_reimbursements SET amount = ?, " +
+                    "submitted = ?, resolved = ?, description = ? , receipt = ?, payment_id = ?, " +
+                    "author_id = ?, resolver_id = ?, " +
                     "status_id = ?, type_id = ? WHERE reimb_id = ?");
-            ps.setString(1, obj.getReimbID());
-            ps.setInt(2, obj.getAmount());
-            ps.setTimestamp(3, obj.getSubmitted());
-            ps.setTimestamp(4,obj.getResolved());
-            ps.setString(5, obj.getDescription());
-            ps.setBytes(6, obj.getReceipt());
-            ps.setString(7,obj.getPaymentID());
-            ps.setString(8, obj.getAuthor().getUserID());
-            ps.setString(9, obj.getResolver().getUserID());
-            ps.setString(10, obj.getReimbursementsStatus().getStatusID());
-            ps.setString(11, obj.getReimbursementsTypes().getTypeID());
+            ps.setInt(1, obj.getAmount());
+            ps.setTimestamp(2, obj.getSubmitted());
+            ps.setTimestamp(3,obj.getResolved());
+            ps.setString(4, obj.getDescription());
+            ps.setBytes(5, obj.getReceipt());
+            ps.setString(6,obj.getPaymentID());
+            ps.setString(7, obj.getAuthor().getUserID());
+            ps.setString(8, obj.getResolver().getUserID());
+            ps.setString(9, obj.getReimbursementsStatus().getStatusID());
+            ps.setString(10, obj.getReimbursementsTypes().getTypeID());
+            ps.setString(11, obj.getReimbID());
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -65,7 +68,7 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
     @Override
     public void delete(String id) {
         try {
-            PreparedStatement ps = con.prepareStatement("DELETE FROM ers_reimbursements where reimb_id = ?");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM ers_reimbursements WHERE reimb_id = ?");
             ps.setString(1, id);
             ps.executeUpdate();
 
