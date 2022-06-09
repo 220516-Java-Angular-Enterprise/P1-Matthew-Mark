@@ -10,6 +10,7 @@ import com.revature.shoe.util.custom_exceptions.AuthenticationException;
 import com.revature.shoe.util.custom_exceptions.InvalidRequestException;
 import com.revature.shoe.util.custom_exceptions.ResourceConflictException;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,10 @@ public class UsersServices {
             } else throw new InvalidRequestException();
         } else throw new ResourceConflictException();
         return users;
+    }
+
+    public List<Users> getAllUsers(){
+        return usersDAO.getAll();
     }
 
     private boolean isValidUsername(String username){

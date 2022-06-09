@@ -10,6 +10,7 @@ com\revature\shoe\daos\UsersRoleDAO.class
 com\revature\shoe\daos\UsersDAO.class
 com\revature\shoe\servlets\UsersServlet.class
 com\revature\shoe\util\custom_exceptions\InvalidRequestException.class
+com\revature\shoe\services\TokenService.class
 com\revature\shoe\dtos\requests\NewUserRequest.class
 com\revature\shoe\util\custom_exceptions\AuthenticationException.class
 com\revature\shoe\util\custom_exceptions\ResourceConflictException.class
@@ -17,6 +18,7 @@ com\revature\shoe\util\custom_exceptions\InvalidSQLException.class
 com\revature\shoe\models\ReimbursementsStatus.class
 com\revature\shoe\models\Users.class
 com\revature\shoe\servlets\AuthServlet.class
+com\revature\shoe\util\JwtConfig.class
 com\revature\shoe\daos\ReimbursementsStatusDAO.class
 com\revature\shoe\dtos\responses\Principal.class
 com\revature\shoe\util\custom_exceptions\InvalidUserException.class
