@@ -3,6 +3,7 @@ package com.revature.shoe.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.revature.shoe.daos.UsersDAO;
+import com.revature.shoe.services.TokenService;
 import com.revature.shoe.services.UsersServices;
 import com.revature.shoe.servlets.AuthServlet;
 import com.revature.shoe.servlets.UsersServlet;
@@ -20,8 +21,8 @@ public class ContextLoaderListener implements ServletContextListener {
         ObjectMapper mapper = new ObjectMapper();
 
         /* Dependency injection. */
-        UsersServlet userServlet = new UsersServlet(mapper, new UsersServices(new UsersDAO()));
-        AuthServlet authServlet = new AuthServlet(mapper, new UsersServices(new UsersDAO()));
+        UsersServlet userServlet = new UsersServlet(mapper, new UsersServices(new UsersDAO()), new TokenService(new JwtConfig()));
+        AuthServlet authServlet = new AuthServlet(mapper, new UsersServices(new UsersDAO()), new TokenService(new JwtConfig()));
 
         /* Need ServletContext class to map whatever servlet to url path. */
         ServletContext context = sce.getServletContext();
