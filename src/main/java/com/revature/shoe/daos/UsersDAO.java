@@ -19,7 +19,6 @@ public class UsersDAO implements CrudDAO<Users>{
     //note that this DAO does not encrypt/decrypt passwords yet
     @Override
     public void update(Users user) {
-        //This method updates *every* field of the database for a user.  Use with care!
         try{
             PreparedStatement ps = con.prepareStatement("Update ers_users SET username = ?, email = ?, password = ?, given_name = ?, surname = ?, is_active = ?, role_id = ? WHERE user_id = ?");
             ps.setString(1, user.getUsername());
@@ -52,12 +51,14 @@ public class UsersDAO implements CrudDAO<Users>{
     @Override
     public Users getById(String id) {
         Users user = new Users();
-
+        UsersRole role = new UsersRole();
         try {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users WHERE user_id = ?");
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                role.setRoleID(rs.getString("role_id"));
+                role.setRoleName(rs.getString("role_name"));
                 user.setUserID(id);
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
@@ -65,7 +66,6 @@ public class UsersDAO implements CrudDAO<Users>{
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
-//                user.setUsersRole(rs.getString("role_id"));
             }
         } catch (SQLException e) {
             //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
@@ -73,28 +73,32 @@ public class UsersDAO implements CrudDAO<Users>{
         }
         return user;
     }
-    public Users getByUsername(String username){
-        Users user = new Users();
-
+    public List<Users> getUsersByUsername(String name){
+        List<Users> users = new ArrayList<>();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users WHERE username = ?");
-            ps.setString(1, username);
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username LIKE ?");
+            ps.setString(1,'%'+ name +'%');
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                user.setUserID(rs.getString("user_id"));
-                user.setUsername(username);
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
-                user.setGivenName(rs.getString("given_name"));
-                user.setSurName(rs.getString("surname"));
-                user.setActive(rs.getBoolean("is_active"));
-//                user.setUsersRole(rs.getString("role_id"));
+                UsersRole role = new UsersRole();
+                role.setRoleName(rs.getString("role_name"));
+                role.setRoleID(rs.getString("role_id"));
+                users.add(new Users(
+                        rs.getString("user_id"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("given_name"),
+                        rs.getString("surname"),
+                        rs.getBoolean("is_active"),
+                        role));
+
             }
         } catch (SQLException e) {
             //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
             throw new RuntimeException(e.getMessage());
         }
-        return user;
+        return users;
     }
     @Override
     public List<Users> getAll() {
@@ -105,6 +109,9 @@ public class UsersDAO implements CrudDAO<Users>{
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Users user = new Users();
+                UsersRole role = new UsersRole();
+                role.setRoleID(rs.getString("role_id"));
+                role.setRoleName(rs.getString("role_name"));
                 user.setUserID(rs.getString("user_id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
@@ -112,7 +119,7 @@ public class UsersDAO implements CrudDAO<Users>{
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
-//                user.setUsersRole(rs.getString("role_id"));
+                user.setUsersRole(role);
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -233,7 +240,4 @@ public class UsersDAO implements CrudDAO<Users>{
         }
         return users;
     }
-
-
-
 }

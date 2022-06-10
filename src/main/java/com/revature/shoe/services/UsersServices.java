@@ -54,6 +54,9 @@ public class UsersServices {
     public void updateUserToActive(Users user) {
         usersDAO.update(user);
     }
+    public List<Users> getUsersByUsername(String name) {
+       return usersDAO.getUsersByUsername(name);
+    }
 
     private boolean isValidUsername(String username){
         return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
