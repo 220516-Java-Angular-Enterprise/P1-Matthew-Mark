@@ -29,6 +29,7 @@ public class UsersDAO implements CrudDAO<Users>{
             ps.setString(5, user.getSurName());
             ps.setBoolean(6, user.isActive());
             ps.setString(7, user.getUsersRole().getRoleID());
+            ps.setString(8, user.getUserID());
             ps.executeUpdate();
         } catch (SQLException e){
             //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
@@ -172,5 +173,67 @@ public class UsersDAO implements CrudDAO<Users>{
         }
         return user;
     }
+    public Users getUsername(String username, String password){
+        Users user = null;
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ? AND password = ?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                user = new Users();
+                user.setUserID(rs.getString("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setGivenName(rs.getString("given_name"));
+                user.setSurName(rs.getString("surname"));
+                user.setActive(rs.getBoolean("is_active"));
+
+                //Sets user's UserRole object
+                UsersRole usersRole= new UsersRole();
+                usersRole.setRoleID(rs.getString("role_id"));
+                usersRole.setRoleName(rs.getString("role_name"));
+                user.setUsersRole(usersRole);
+            }
+        } catch (SQLException e) {
+            //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
+            throw new RuntimeException(e.getMessage());
+        }
+        return user;
+    }
+    public List<Users> getUsersByStatus(boolean status){ // boolean status
+        List<Users> users = new ArrayList<>();
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on ers_user_roles.role_id = ers_users.role_id WHERE ers_users.is_active = ?");
+            ps.setBoolean(1, status);
+            ResultSet rs = ps.executeQuery();
+             while(rs.next()) {
+                Users user = new Users();
+                user.setUserID(rs.getString("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setGivenName(rs.getString("given_name"));
+                user.setSurName(rs.getString("surname"));
+                user.setActive(rs.getBoolean("is_active"));
+
+                //Sets user's UserRole object
+                UsersRole usersRole= new UsersRole();
+                usersRole.setRoleID(rs.getString("role_id"));
+                usersRole.setRoleName(rs.getString("role_name"));
+                user.setUsersRole(usersRole);
+
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            //Need to create a custom sql exception throw to UserService. UserService should handle error logging.
+            throw new RuntimeException(e.getMessage());
+        }
+        return users;
+    }
+
+
 
 }
