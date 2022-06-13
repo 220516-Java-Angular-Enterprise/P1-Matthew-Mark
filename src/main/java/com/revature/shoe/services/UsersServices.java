@@ -19,24 +19,28 @@ public class UsersServices {
     private final UsersDAO usersDAO;
 
     @Inject
-    public UsersServices(UsersDAO usersDAO){
+    public UsersServices(UsersDAO usersDAO) {
         this.usersDAO = usersDAO;
     }
 
 
-    public Users login(LoginRequest request){
-        if(!isValidUsername(request.getUsername()) || !isValidPassword(request.getPassword())) throw new InvalidRequestException("Invalid username or password");
+    public Users login(LoginRequest request) {
+        if (!isValidUsername(request.getUsername()) || !isValidPassword(request.getPassword()))
+            throw new InvalidRequestException("Invalid username or password");
         Users users = usersDAO.getUsersByNamePassword(request.getUsername(), request.getPassword());
-        if(users == null) throw new AuthenticationException("Invalid credentials");
+
+        if (users == null) throw new AuthenticationException("Invalid credentials");
+
+        if (!users.isActive()) throw new AuthenticationException("Inactive User");
         return users;
     }
 
-    public Users register(NewUserRequest request){
+    public Users register(NewUserRequest request) {
         //todo implement NewUserRequest
         Users users = request.extractUsers();
-        if(isNotDuplicate(users.getUsername())){
-            if(isValidUsername(users.getUsername())){
-                if(isValidPassword(users.getPassword())){
+        if (isNotDuplicate(users.getUsername())) {
+            if (isValidUsername(users.getUsername())) {
+                if (isValidPassword(users.getPassword())) {
                     users.setUserID(UUID.randomUUID().toString());
                     usersDAO.save(users);
                 } else throw new InvalidRequestException();
@@ -45,19 +49,37 @@ public class UsersServices {
         return users;
     }
 
-    public List<Users> getAllUsers(){
+    public List<Users> getAllUsers() {
         return usersDAO.getAll();
     }
+
     public List<Users> getAllUsersByUserStatus(boolean status) {
         return usersDAO.getUsersByStatus(status);
     }
+
     public void updateUserToActive(Users user) {
         usersDAO.update(user);
     }
-    public List<Users> getUsersByUsername(String name) {
-       return usersDAO.getUsersByUsername(name);
+
+    public Users getUserByUsername(String name) {
+        return usersDAO.getUserByUsername(name);
     }
 
+    public List<Users> getUsersLikeUsername(String name) {
+        return usersDAO.getUsersLikeUsername(name);
+    }
+
+    public void updateUserPassword(String name, String password) {
+        if (name != null && password != null) {
+        Users users = usersDAO.getUserByUsername(name);
+        if (users != null) {
+            if (isValidPassword(password)) {
+                users.setPassword(password);
+                usersDAO.update(users);
+            } else throw new InvalidRequestException("Invalid Password");
+        } else throw new InvalidRequestException("Invalid Username");
+    } else throw new InvalidRequestException("Null Username/Password");
+}
     private boolean isValidUsername(String username){
         return username.matches("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");
     }

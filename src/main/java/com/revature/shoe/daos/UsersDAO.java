@@ -73,7 +73,7 @@ public class UsersDAO implements CrudDAO<Users>{
         }
         return user;
     }
-    public List<Users> getUsersByUsername(String name){
+    public List<Users> getUsersLikeUsername(String name){
         List<Users> users = new ArrayList<>();
         try {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username LIKE ?");
@@ -82,16 +82,17 @@ public class UsersDAO implements CrudDAO<Users>{
             while (rs.next()) {
                 UsersRole role = new UsersRole();
                 role.setRoleName(rs.getString("role_name"));
-                role.setRoleID(rs.getString("role_id"));
-                users.add(new Users(
-                        rs.getString("user_id"),
-                        rs.getString("username"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("given_name"),
-                        rs.getString("surname"),
-                        rs.getBoolean("is_active"),
-                        role));
+
+                Users user = new Users();
+                user.setUserID(rs.getString("user_id"));
+                user.setUsersRole(role);
+                user.setEmail(rs.getString("email"));
+                user.setActive(rs.getBoolean("is_active"));
+                user.setUsername(rs.getString("username"));
+                user.setGivenName(rs.getString("given_name"));
+                user.setSurName(rs.getString("surname"));
+
+                users.add(user);
 
             }
         } catch (SQLException e) {
@@ -103,19 +104,16 @@ public class UsersDAO implements CrudDAO<Users>{
     @Override
     public List<Users> getAll() {
         List<Users> users = new ArrayList<>();
-        //This will not work with the current database schema, because it does not have a surname column (as of 06/05)
         try {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id ");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Users user = new Users();
                 UsersRole role = new UsersRole();
-                role.setRoleID(rs.getString("role_id"));
                 role.setRoleName(rs.getString("role_name"));
                 user.setUserID(rs.getString("user_id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
@@ -133,8 +131,7 @@ public class UsersDAO implements CrudDAO<Users>{
     @Override
     public void save(Users user){
         try{
-            //This will not work with the current database schema, because it does not have a surname column (as of 06/05)
-            PreparedStatement ps = con.prepareStatement("INSERT INTO ers_users (user_id, username, email, password, given_name, surname, is_active, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO ers_users (user_id, username, email, password, given_name, surname, is_active, role_id) VALUES (?, ?, ?, crypt(?,gen_salt('bf')), ?, ?, ?, ?)");
             ps.setString(1, user.getUserID());
             ps.setString(2, user.getUsername());
             ps.setString(3, user.getEmail());
@@ -154,7 +151,7 @@ public class UsersDAO implements CrudDAO<Users>{
     public Users getUsersByNamePassword(String username, String password){
         Users user = null;
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ? AND password = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ? AND password = crypt(?,password) ");
             ps.setString(1, username);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
@@ -180,19 +177,17 @@ public class UsersDAO implements CrudDAO<Users>{
         }
         return user;
     }
-    public Users getUsername(String username, String password){
+    public Users getUserByUsername(String username){
         Users user = null;
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ? AND password = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_users INNER JOIN ers_user_roles on  ers_user_roles.role_id = ers_users.role_id WHERE username = ?");
             ps.setString(1, username);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 user = new Users();
                 user.setUserID(rs.getString("user_id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
@@ -220,7 +215,7 @@ public class UsersDAO implements CrudDAO<Users>{
                 user.setUserID(rs.getString("user_id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
+                 user.setPassword(rs.getString("password"));
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
@@ -232,6 +227,7 @@ public class UsersDAO implements CrudDAO<Users>{
                 user.setUsersRole(usersRole);
 
                 users.add(user);
+
             }
 
         } catch (SQLException e) {
