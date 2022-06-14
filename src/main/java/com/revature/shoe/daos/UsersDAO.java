@@ -20,7 +20,7 @@ public class UsersDAO implements CrudDAO<Users>{
     @Override
     public void update(Users user) {
         try{
-            PreparedStatement ps = con.prepareStatement("Update ers_users SET username = ?, email = ?, password = ?, given_name = ?, surname = ?, is_active = ?, role_id = ? WHERE user_id = ?");
+            PreparedStatement ps = con.prepareStatement("Update ers_users SET username = ?, email = ?, password = crypt(?,gen_salt('bf')), given_name = ?, surname = ?, is_active = ?, role_id = ? WHERE user_id = ?");
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());

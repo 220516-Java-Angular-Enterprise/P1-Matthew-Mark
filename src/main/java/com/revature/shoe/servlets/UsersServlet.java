@@ -44,14 +44,6 @@ public class UsersServlet extends HttpServlet {
             // uri conditionals with helper functions
             if (uris.length == 4) {
 
-                if (uris[3].equals("active")) { // gets active users, sets user to inactive
-                    getInactiveOrActiveUsers(uris, request, requester, resp);
-                    return;
-                }
-                if (uris[3].equals("unactive")) { // gets inactive users
-                    getInactiveOrActiveUsers(uris, request, requester, resp);
-                    return;
-                }
                 if (uris[3].equals("username")) {
                     getUserByUsername(request, requester, resp);
                     return;
@@ -60,12 +52,7 @@ public class UsersServlet extends HttpServlet {
                    getUsersLikeUsername(request, requester, resp);
                    return;
                 }
-                if (uris[3].equals("password")) {
-                    updatePassword(request, requester, resp);
-                    return;
-                }
             }
-
             // creating new user, keep here
             if (uris.length == 3) {
                 if (uris[2].equals("users")) { // create new user
@@ -73,10 +60,8 @@ public class UsersServlet extends HttpServlet {
                     resp.setStatus(201); // CREATED
                     resp.setContentType("application/json");
                     resp.getWriter().write(objectMapper.writeValueAsString(createdUser.getUserID()));
-
                 }
             }
-
         } catch (InvalidRequestException e) {
             resp.setStatus(404); // BAD REQUEST
         } catch (ResourceConflictException e) {
@@ -86,7 +71,6 @@ public class UsersServlet extends HttpServlet {
             resp.setStatus(500);
         }
     }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
         Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
@@ -126,6 +110,38 @@ public class UsersServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.getWriter().write(objectMapper.writeValueAsString(users));
 
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException {
+        try {
+            String[] uris = req.getRequestURI().split("/");
+            Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
+            NewUserRequest request = objectMapper.readValue(req.getInputStream(), NewUserRequest.class);
+
+
+            if (uris.length == 4) {
+                if (uris[3].equals("active")) { // gets active users, sets user to inactive
+                    getInactiveOrActiveUsers(uris, request, requester, resp);
+                    return;
+                }
+                if (uris[3].equals("unactive")) { // gets inactive users
+                    getInactiveOrActiveUsers(uris, request, requester, resp);
+                    return;
+                }
+                if (uris[3].equals("password")) {
+                    updatePassword(request, requester, resp);
+                    return;
+                }
+            }
+        } catch (InvalidRequestException e) {
+            resp.setStatus(404); // BAD REQUEST
+        } catch (ResourceConflictException e) {
+            resp.setStatus(409); // RESOURCE CONFLICT
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(500);
+        }
     }
     private void getInactiveOrActiveUsers(String[] uris, NewUserRequest request, Principal requester,HttpServletResponse resp) throws IOException {
             List<Users> users;
@@ -193,36 +209,4 @@ public class UsersServlet extends HttpServlet {
         usersServices.updateUserPassword(request.getUsername(), request.getPassword());
         resp.setStatus(200);
     }
-
-    private void loginValidation(LoginRequest request, Principal requester, HttpServletResponse resp) {
-        if (requester == null) {
-            resp.setStatus(401);
-            return;
-        }
-        if (!requester.getRole().equals("ADMIN")) {
-            resp.setStatus(403);
-            return;
-        }
-        usersServices.login(request);
-        resp.setStatus(200);
-    }
-        /*
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            NewUserRequest request = objectMapper.readValue(req.getInputStream(), NewUserRequest.class);
-            Users createdUser = usersServices.register(request);
-            resp.setStatus(201); // CREATED
-            resp.setContentType("application/json");
-            resp.getWriter().write(objectMapper.writeValueAsString(createdUser.getUserID()));
-        } catch (InvalidRequestException e) {
-            resp.setStatus(404); // BAD REQUEST
-        } catch (ResourceConflictException e) {
-            resp.setStatus(409); // RESOURCE CONFLICT
-        } catch (Exception e) {
-            e.printStackTrace();
-            resp.setStatus(500);
-        }
-    }
-     */
 }

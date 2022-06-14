@@ -1,10 +1,12 @@
 package com.revature.shoe.services;
 
 import com.revature.shoe.daos.UsersDAO;
+import com.revature.shoe.daos.UsersRoleDAO;
 import com.revature.shoe.dtos.requests.LoginRequest;
 import com.revature.shoe.dtos.requests.NewUserRequest;
 import com.revature.shoe.dtos.responses.Principal;
 import com.revature.shoe.models.Users;
+import com.revature.shoe.models.UsersRole;
 import com.revature.shoe.util.annotations.Inject;
 import com.revature.shoe.util.custom_exceptions.AuthenticationException;
 import com.revature.shoe.util.custom_exceptions.InvalidRequestException;
@@ -23,7 +25,6 @@ public class UsersServices {
         this.usersDAO = usersDAO;
     }
 
-
     public Users login(LoginRequest request) {
         if (!isValidUsername(request.getUsername()) || !isValidPassword(request.getPassword()))
             throw new InvalidRequestException("Invalid username or password");
@@ -36,19 +37,24 @@ public class UsersServices {
     }
 
     public Users register(NewUserRequest request) {
-        //todo implement NewUserRequest
         Users users = request.extractUsers();
+        String role = request.getUsersRole();
+        if (role == null) {role = "DEFAULT";}
+        if (isValidRole(role)) {
         if (isNotDuplicate(users.getUsername())) {
             if (isValidUsername(users.getUsername())) {
                 if (isValidPassword(users.getPassword())) {
-                    users.setUserID(UUID.randomUUID().toString());
-                    usersDAO.save(users);
-                } else throw new InvalidRequestException();
-            } else throw new InvalidRequestException();
-        } else throw new ResourceConflictException();
+                    if (isValidEmail(users.getEmail())) {
+                        users.setUserID(UUID.randomUUID().toString());
+                        users.setUsersRole(new UsersRoleDAO().getUserRoleByRolename(role));
+                        usersDAO.save(users);
+                    } else throw new InvalidRequestException("Invalid Email");
+                } else throw new InvalidRequestException("Invalid Password");
+            } else throw new InvalidRequestException("Invalid Username");
+        } else throw new ResourceConflictException("Duplicate Username");
+        } else throw new InvalidRequestException("Invalid Role");
         return users;
     }
-
     public List<Users> getAllUsers() {
         return usersDAO.getAll();
     }
@@ -90,5 +96,12 @@ public class UsersServices {
 
     private boolean isNotDuplicate(String username){
         return !usersDAO.getAll().stream().map(users -> users.getUsername()).collect(Collectors.toList()).contains(username);
+    }
+
+    private boolean isValidRole(String rolename) {
+        return rolename.equals("DEFAULT") || rolename.equals("FMANAGER");
+    }
+    public boolean isValidEmail(String email){
+        return email.matches("^([\\w][\\-\\_\\.]?)*\\w@([\\w+]\\-?)*\\w\\.\\w+$");
     }
 }
