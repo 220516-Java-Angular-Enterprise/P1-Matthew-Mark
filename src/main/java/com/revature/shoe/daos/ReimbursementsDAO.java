@@ -165,9 +165,9 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
 
         try {
             PreparedStatement ps = con.prepareStatement("SELECT reimb_id, amount, submitted ,resolved ,description ,receipt ,payment_id ,author_id , " +
-                    "resolver_id ,r.status_id ,r.type_id , u.user_id ,u.username, u.email, u.password, u.given_name ,u.surname , u.is_active , " +
+                    "resolver_id ,r.status_id ,r.type_id , u.user_id , u.username as aut_name, u.email, u.password, u.given_name ,u.surname , u.is_active as aut_is_active, " +
                     "u.role_id, eu.user_id as res_id, eu.username as res_name, eu.email as res_email, eu.password as res_password, " +
-                    "eu.given_name as res_given_name, eu.surname as res_surname, eu.is_active as res_is_active, eu.role_id as res_role_id from ers_reimbursements r " +
+                    "eu.given_name as res_given_name, eu.surname as res_surname, eu.is_active as res_is_active, eu.role_id as res_role_id, s.status, t.type_name from ers_reimbursements r " +
                     "left join ers_users u on u.user_id = author_id " +
                     "left join ers_users eu on eu.user_id = resolver_id " +
                     "inner join ers_reimbursement_types t on t.type_id = r.type_id " +
@@ -181,9 +181,15 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
                 ReimbursementsTypes types = new ReimbursementsTypes();
 
                 author.setUserID(rs.getString("author_id"));
+                author.setUsername(rs.getString("aut_name"));
+                author.setActive(rs.getBoolean("aut_is_active"));
                 resolver.setUserID(rs.getString("resolver_id"));
-                status.setStatusID(rs.getString("status_id"));
-                types.setTypeID(rs.getString("type_id"));
+                resolver.setUsername(rs.getString("res_name"));
+                resolver.setActive(rs.getBoolean("res_is_active"));
+                //status.setStatusID(rs.getString("status_id"));
+                status.setStatus(rs.getString("status"));
+                //types.setTypeID(rs.getString("type_id"));
+                types.setTypeName(rs.getString("type_name"));
 
                 Reimbursements reimb = new Reimbursements(rs.getString("reimb_id"),
                         rs.getInt("amount"),
@@ -203,5 +209,20 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             throw new RuntimeException(e.getMessage());
         }
         return sortedList;
+    }
+
+    public List<String> getColumnNames(){
+        List<String> columnNames = new ArrayList<>();
+        try {
+            PreparedStatement ps = con.prepareStatement("select column_name from INFORMATION_SCHEMA.COLUMNS " +
+                    "WHERE TABLE_NAME = N'ers_reimbursements'");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                columnNames.add(rs.getString("column_name"));
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        return columnNames;
     }
 }

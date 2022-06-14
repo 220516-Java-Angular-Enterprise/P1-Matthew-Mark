@@ -113,7 +113,7 @@ public class ReimbursementsService {
     public List<Reimbursements> getReimbFilter(ReimbursementFilter filter, Principal requester, boolean pending){
         List<Reimbursements> reimbursementsList = new ArrayList<>();
 
-        Users users = new Users(); //todo implemnt this
+        Users users = usersServices.getUserByUsername(requester.getUsername());
         if(users == null)throw new InvalidRequestException("No user with this username");
 
         String sql = "";
@@ -121,26 +121,21 @@ public class ReimbursementsService {
             Map<String, String> where = BeanUtils.describe(filter);
             for (Map.Entry<String, String> key: where.entrySet()) {
                 if(key.getValue() != null) {
-                    //todo also set key to user with the same username
-
                     if(key.getKey().equals("username")) {
                         if (requester.getRole().equals("DEFAULT")) { //If user is a default employee
                             sql += " eu.username LIKE ";
-                        } else {
+                        } else if(requester.getRole().equals("FMANAGER")) {
                             sql += " u.username LIKE ";
                         }
-                    }
-
-                    if (key.getKey().equals("submitted") || key.getKey().equals("resolved")) sql += " " + key.getKey() + "::text LIKE ";
+                    }else if (key.getKey().equals("submitted") || key.getKey().equals("resolved")) sql += " " + key.getKey() + "::text LIKE ";
                     else  sql += " " + key.getKey() + " LIKE ";
                     sql += "'%" + key.getValue() + "%' AND";
                 }
-
-
             }
             if (pending) sql += " r.status_id = '1'";
             else sql += " r.status_id = '2' OR r.status_id = '3'";
             if(requester.getRole().equals("DEFAULT")) sql += " AND author_id = '" + requester.getId() + "'";
+            else if(!pending) sql += " AND resolver_id = '" + requester.getId() + "'";
             reimbursementsList = reimbursementsDAO.getFiltered(sql);
 
         } catch (Exception e) {
@@ -169,6 +164,7 @@ public class ReimbursementsService {
         return null;
     }
     private  boolean isValidColumnName(String columnName){
-        return columnName.matches("amount|submitted|resolved|payment_id");
+        return reimbursementsDAO.getColumnNames().contains(columnName);
+        //return columnName.matches("amount|submitted|resolved|payment_id");
     }
 }

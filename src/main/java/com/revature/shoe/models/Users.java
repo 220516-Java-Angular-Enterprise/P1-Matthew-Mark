@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Users {
     private String userID;
     private String username;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String email;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String givenName;
+
     private boolean isActive;
     private UsersRole usersRole;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String surName;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
