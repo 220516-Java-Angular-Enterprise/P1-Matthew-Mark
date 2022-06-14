@@ -1,14 +1,18 @@
 package com.revature.shoe.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class Users {
     private String userID;
     private String username;
-    private String password;
     private String email;
     private String givenName;
-    private String surName;
     private boolean isActive;
     private UsersRole usersRole;
+    private String surName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String password;
 
     public Users() {
 

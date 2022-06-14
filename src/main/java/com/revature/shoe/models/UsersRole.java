@@ -1,6 +1,9 @@
 package com.revature.shoe.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class UsersRole {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String roleID;
     private String roleName;
 
