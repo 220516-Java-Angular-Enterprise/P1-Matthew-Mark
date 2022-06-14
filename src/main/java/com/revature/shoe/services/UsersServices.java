@@ -39,6 +39,9 @@ public class UsersServices {
     public Users register(NewUserRequest request) {
         Users users = request.extractUsers();
         String role = request.getUsersRole();
+        if ((request.getUsername() == null) || (request.getPassword() == null) || (request.getEmail()) == null ||
+                (request.getSurname() == null) || (request.getGiven_name() == null )) throw new InvalidRequestException("Null Input");
+
         if (role == null) {role = "DEFAULT";}
         if (isValidRole(role)) {
         if (isNotDuplicate(users.getUsername())) {
@@ -47,6 +50,7 @@ public class UsersServices {
                     if (isValidEmail(users.getEmail())) {
                         users.setUserID(UUID.randomUUID().toString());
                         users.setUsersRole(new UsersRoleDAO().getUserRoleByRolename(role));
+                        users.setActive(false);
                         usersDAO.save(users);
                     } else throw new InvalidRequestException("Invalid Email");
                 } else throw new InvalidRequestException("Invalid Password");
@@ -101,7 +105,7 @@ public class UsersServices {
     private boolean isValidRole(String rolename) {
         return rolename.equals("DEFAULT") || rolename.equals("FMANAGER");
     }
-    public boolean isValidEmail(String email){
+    private boolean isValidEmail(String email){
         return email.matches("^([\\w][\\-\\_\\.]?)*\\w@([\\w+]\\-?)*\\w\\.\\w+$");
     }
 }
