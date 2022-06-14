@@ -35,6 +35,16 @@ public class UsersDAO implements CrudDAO<Users>{
             throw new RuntimeException(e.getMessage());
         }
     }
+    public void updateStatus(Users user) {
+        try{
+            PreparedStatement ps = con.prepareStatement("Update ers_users SET status = ? WHERE username = ?");
+            ps.setBoolean(1, user.isActive());
+            ps.setString(2, user.getUsername());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void delete(String id) {
@@ -215,7 +225,7 @@ public class UsersDAO implements CrudDAO<Users>{
                 user.setUserID(rs.getString("user_id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                 user.setPassword(rs.getString("password"));
+                user.setPassword(rs.getString("password"));
                 user.setGivenName(rs.getString("given_name"));
                 user.setSurName(rs.getString("surname"));
                 user.setActive(rs.getBoolean("is_active"));
