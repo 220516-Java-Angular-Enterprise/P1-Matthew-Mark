@@ -68,7 +68,7 @@ public class UsersServices {
     }
 
     public void updateUserToActive(Users user) {
-        usersDAO.update(user);
+        usersDAO.updateStatus(user);
     }
 
     public Users getUserByUsername(String name) {
