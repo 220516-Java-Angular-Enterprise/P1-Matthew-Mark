@@ -1,6 +1,0 @@
-com/revature/shoe/util/JwtConfig.class
-com/revature/shoe/util/custom_exceptions/AuthenticationException.class
-com/revature/shoe/dtos/responses/Principal.class
-com/revature/shoe/dtos/requests/LoginRequest.class
-com/revature/shoe/servlets/AuthServlet.class
-com/revature/shoe/services/TokenService.class

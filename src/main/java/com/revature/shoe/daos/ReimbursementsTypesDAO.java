@@ -54,16 +54,17 @@ public class ReimbursementsTypesDAO implements CrudDAO<ReimbursementsTypes> {
         }
     }
 
+
+    //Changed from id to type name as someone is more likely to use that when entering a new reimbursement
     @Override
     public ReimbursementsTypes getById(String id) {
         ReimbursementsTypes type = null;
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM reimbursement_types" +
-                    "WHERE type_id = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursement_types WHERE type_name = ?");
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
-                type = new ReimbursementsTypes(id,
+            if(rs.next()) {
+                type = new ReimbursementsTypes(rs.getString("type_id"),
                         rs.getString("type_name"));
             }
 

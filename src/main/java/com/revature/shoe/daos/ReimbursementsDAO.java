@@ -31,10 +31,12 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             ps.setBytes(6, obj.getReceipt());
             ps.setString(7, obj.getPaymentID());
             ps.setString(8, obj.getAuthor().getUserID());
-            ps.setString(9, obj.getResolver().getUserID());
+            ps.setString(9, null);
             ps.setString(10, obj.getReimbursementsStatus().getStatusID());
             ps.setString(11, obj.getReimbursementsTypes().getTypeID());
             ps.executeUpdate();
+
+            //obj.getResolver().getUserID()
     } catch(SQLException e)
     {
         throw new RuntimeException(e.getMessage());
@@ -65,6 +67,19 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             throw new RuntimeException(e);
         }
     }
+
+    public void updateStatus(Reimbursements reimbursements){
+        try {
+            PreparedStatement ps = con.prepareStatement("UPDATE ers_reimbursements SET status_id = ?, resolver_id = ?, resolved = ? WHERE reimb_id = ?");
+            ps.setString(1, reimbursements.getReimbursementsStatus().getStatusID());
+            ps.setString(2, reimbursements.getResolver().getUserID());
+            ps.setTimestamp(3, reimbursements.getResolved());
+            ps.setString(4, reimbursements.getReimbID());
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public void delete(String id) {
         try {
@@ -82,36 +97,20 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
     public Reimbursements getById(String id) {
         Reimbursements reimb = null;
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT reimb_id, amount, submitted ,resolved ,description ,receipt ,payment_id ,author_id ," +
-                    "resolver_id ,status_id ,type_id , u.user_id ,u.username, u.email, u.password, u.given_name ,u.surname , u.is_active , " +
-                    "u.role_id, eu.user_id as 'res_id', eu.username as 'res_name', eu.email as 'res_email', eu.password as 'res_password', " +
-                    "eu.given_name as 'res_given_name', eu.surname as 'res_surname', eu.is_active as 'res_is_active', eu.role_id as 'res_role_id' " +
-                    "WHERE reimb_id = ?");
-
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_reimbursements WHERE reimb_id = ?");
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Users author = new Users();
-                Users resolver = new Users();
                 ReimbursementsStatus status = new ReimbursementsStatus();
-                ReimbursementsTypes types = new ReimbursementsTypes();
+                Users users = new Users();
 
-                author.setUserID(rs.getString("author_id"));
-                resolver.setUserID(rs.getString("resolver_id"));
+                users.setUserID(rs.getString("author_id"));
                 status.setStatusID(rs.getString("status_id"));
-                types.setTypeID(rs.getString("type_id"));
 
-                reimb = new Reimbursements(id,
-                        rs.getInt("amount"),
-                        rs.getTimestamp("submitted"),
-                        rs.getTimestamp("resolved"),
-                        rs.getString("description"),
-                        rs.getBytes("receipt"), // will return byte[] array
-                        rs.getString("payment_id"),
-                        author,
-                        resolver,
-                        status,
-                        types);
+                reimb = new Reimbursements();
+                reimb.setReimbID(rs.getString("reimb_id"));
+                reimb.setReimbursementsStatus(status);
+                reimb.setAuthor(users);
             }
 
         } catch (SQLException e) {
@@ -157,5 +156,52 @@ public class ReimbursementsDAO implements CrudDAO<Reimbursements> {
             throw new RuntimeException(e.getMessage());
         }
         return reimbs;
+    }
+
+    //todo: finish this DAO and add to service
+    public List<Reimbursements> getFiltered(String sQLString){
+
+        List<Reimbursements> sortedList= new ArrayList<>();
+
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT reimb_id, amount, submitted ,resolved ,description ,receipt ,payment_id ,author_id , " +
+                    "resolver_id ,r.status_id ,r.type_id , u.user_id ,u.username, u.email, u.password, u.given_name ,u.surname , u.is_active , " +
+                    "u.role_id, eu.user_id as res_id, eu.username as res_name, eu.email as res_email, eu.password as res_password, " +
+                    "eu.given_name as res_given_name, eu.surname as res_surname, eu.is_active as res_is_active, eu.role_id as res_role_id from ers_reimbursements r " +
+                    "left join ers_users u on u.user_id = author_id " +
+                    "left join ers_users eu on eu.user_id = resolver_id " +
+                    "inner join ers_reimbursement_types t on t.type_id = r.type_id " +
+                    "inner join ers_reimbursement_statuses s on s.status_id = r.status_id " +
+                    "WHERE " + sQLString);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Users author = new Users();
+                Users resolver = new Users();
+                ReimbursementsStatus status = new ReimbursementsStatus();
+                ReimbursementsTypes types = new ReimbursementsTypes();
+
+                author.setUserID(rs.getString("author_id"));
+                resolver.setUserID(rs.getString("resolver_id"));
+                status.setStatusID(rs.getString("status_id"));
+                types.setTypeID(rs.getString("type_id"));
+
+                Reimbursements reimb = new Reimbursements(rs.getString("reimb_id"),
+                        rs.getInt("amount"),
+                        rs.getTimestamp("submitted"),
+                        rs.getTimestamp("resolved"),
+                        rs.getString("description"),
+                        rs.getBytes("receipt"), // will return byte[] array
+                        rs.getString("payment_id"),
+                        author,
+                        resolver,
+                        status,
+                        types);
+
+                sortedList.add(reimb);
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        return sortedList;
     }
 }
