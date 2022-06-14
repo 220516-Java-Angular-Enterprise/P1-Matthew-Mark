@@ -27,7 +27,7 @@ public class DatabaseConnection {
             //String s = current.toAbsolutePath().toString();
             //todo set up catalan variable
             System.out.println("Current Working Dir: " + System.getProperty("user.dir"));
-            prop.load(new FileReader("D://Git/Revature/P1-Matthew-Mark/src/main/resources/db.properties"));
+            prop.load(new FileReader("src/db.properties"));
 
             /* actually getting this connection */
             con = DriverManager.getConnection(prop.getProperty("url"), prop.getProperty("username"), prop.getProperty("password"));
