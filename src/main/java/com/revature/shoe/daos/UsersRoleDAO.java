@@ -1,5 +1,6 @@
 package com.revature.shoe.daos;
 
+import com.revature.shoe.models.Users;
 import com.revature.shoe.models.UsersRole;
 import com.revature.shoe.util.database.DatabaseConnection;
 
@@ -87,5 +88,21 @@ public class UsersRoleDAO implements CrudDAO<UsersRole> {
             throw new RuntimeException(e);
         }
         return roles;
+    }
+
+    public UsersRole getUserRoleByRolename(String rolename) {
+        UsersRole role = null;
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM ers_user_roles WHERE role_name = ?");
+            ps.setString(1, rolename);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+               role = new UsersRole(rs.getString("role_id"),rs.getString("role_name"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return role;
     }
 }
