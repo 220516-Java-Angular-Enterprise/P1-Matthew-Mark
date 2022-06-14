@@ -9,16 +9,16 @@
 ### Project Description
 
 For our project, we were tasked with building an API that 
-will support a new internal expense reimbursement system. 
+will support a new internal, expense reimbursement system. 
 Our goal was to have our system manage the process of reimbursing employees for expenses incurred 
-while on company time. All registered employees in the company can login and submit 
+while on company time. All registered employees in the company can log in, submit 
 requests for reimbursement and view their past tickets and pending requests. 
-Finance managers can login and view all reimbursement requests and past history for 
-all employees in the company. Finance managers also are authorized to approve and deny 
+Finance managers can log in, view all reimbursement requests, and past history for 
+all employees in the company. They are also authorized to approve and deny 
 requests for expense reimbursement.
 
 ### Technologies 
-**Persistance Tier**
+**Persistence Tier**
 - Postgresql
 
 **Application Tier**
