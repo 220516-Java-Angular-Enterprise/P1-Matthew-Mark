@@ -37,7 +37,7 @@ public class UsersDAO implements CrudDAO<Users>{
     }
     public void updateStatus(Users user) {
         try{
-            PreparedStatement ps = con.prepareStatement("Update ers_users SET status = ? WHERE username = ?");
+            PreparedStatement ps = con.prepareStatement("Update ers_users SET is_active = ? WHERE username = ?");
             ps.setBoolean(1, user.isActive());
             ps.setString(2, user.getUsername());
             ps.executeUpdate();
