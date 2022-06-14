@@ -1,12 +1,18 @@
 package com.revature.shoe.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Reimbursements {
     private byte[] receipt;
     private String reimbID;
     private int amount;
     private Timestamp submitted;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Timestamp resolved;
     private String description;
 
@@ -22,6 +28,13 @@ public class Reimbursements {
 
     public Reimbursements() {
 
+    }
+
+    public Reimbursements(byte[] receipt, String description, String paymentID, ReimbursementsTypes reimbursementsTypes) {
+        this.receipt = receipt;
+        this.description = description;
+        this.paymentID = paymentID;
+        this.reimbursementsTypes = reimbursementsTypes;
     }
 
     public String getPaymentID() {
@@ -128,4 +141,32 @@ public class Reimbursements {
     public void setReimbursementsTypes(ReimbursementsTypes reimbursementsTypes) {
         this.reimbursementsTypes = reimbursementsTypes;
     }
+
+    //todo enable comma parsing with (while loop and group count?) and spliting the string at the decimal instead of excluding it from the regex;
+    public boolean setAmount(String amount){
+        Pattern pattern = Pattern.compile("^\\$?(\\d+)\\.?(?<decimal>\\d+)?$");
+        Matcher matcher = pattern.matcher(amount);
+        String one = "";
+        if(matcher.matches()){
+            if(matcher.group("decimal") == null) {
+                for (int i = 1; i <= matcher.groupCount()-1; i++) {
+                    one = one + matcher.group(i);
+                }
+                one = one + "00";
+            }else{
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    one = one + matcher.group(i);
+                }
+            }
+            setAmount(Integer.valueOf(one));
+            return true;
+        }
+        return false;
+    }
+
+    //todo implement this method if willing
+    public String getAmountAsString(){
+        return null;
+    }
+
 }
