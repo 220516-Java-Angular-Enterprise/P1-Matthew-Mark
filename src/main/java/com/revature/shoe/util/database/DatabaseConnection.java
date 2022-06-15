@@ -27,13 +27,13 @@ public class DatabaseConnection {
             //String s = current.toAbsolutePath().toString();
             //todo set up catalan variable
             System.out.println("Current Working Dir: " + System.getProperty("user.dir"));
-            prop.load(new FileReader("/src/main/resources/db.properties"));
+            //prop.load(new FileReader("/src/main/resources/db.properties")); //I will see you in hell
 
             /* actually getting this connection */
             con = DriverManager.getConnection("jdbc:postgresql://java-ee-220516.c88qonns6zq3.us-west-2.rds.amazonaws.com:5432/postgres?currentSchema=reimbursement", "postgres", "revature");
 
             /* throw Exception if connection was not successful */
-        } catch (ClassNotFoundException | SQLException | IOException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
