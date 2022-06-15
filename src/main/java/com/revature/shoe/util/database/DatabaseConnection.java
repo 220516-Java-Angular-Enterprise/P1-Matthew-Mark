@@ -30,7 +30,7 @@ public class DatabaseConnection {
             prop.load(new FileReader("/src/main/resources/db.properties"));
 
             /* actually getting this connection */
-            con = DriverManager.getConnection(prop.getProperty("url"), prop.getProperty("username"), prop.getProperty("password"));
+            con = DriverManager.getConnection("jdbc:postgresql://java-ee-220516.c88qonns6zq3.us-west-2.rds.amazonaws.com:5432/postgres?currentSchema=reimbursement", "postgres", "revature");
 
             /* throw Exception if connection was not successful */
         } catch (ClassNotFoundException | SQLException | IOException e) {
