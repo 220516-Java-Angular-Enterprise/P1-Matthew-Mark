@@ -8,10 +8,10 @@ import com.revature.shoe.services.UsersServices;
 import com.revature.shoe.util.annotations.Inject;
 import com.revature.shoe.util.custom_exceptions.AuthenticationException;
 import com.revature.shoe.util.custom_exceptions.InvalidRequestException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
