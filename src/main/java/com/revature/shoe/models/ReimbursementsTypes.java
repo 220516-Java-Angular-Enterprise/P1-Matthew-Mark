@@ -1,7 +1,10 @@
 package com.revature.shoe.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ReimbursementsTypes {
     private String typeID;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String typeName;
 
     public ReimbursementsTypes() {
