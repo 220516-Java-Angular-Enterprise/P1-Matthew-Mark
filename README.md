@@ -1,6 +1,6 @@
 # P1: Reimbursement System
 ### Mark Quercioli: Full Stack JAVA Developer at Revature
-### Matthew Berheimer: Full Stack JAVA Developer at Revature
+### Matthew Berkheimer: Full Stack JAVA Developer at Revature
 ## Java Enterprise Foundations Project
 
 ### Contents
@@ -11,11 +11,11 @@
 ### Project Description
 
 For our project, we were tasked with building an API that 
-will support a new internal, expense reimbursement system. 
+will support a new internal expense reimbursement system. 
 Our goal was to have our system manage the process of reimbursing employees for expenses incurred 
-while on company time. All registered employees in the company can log in, submit 
+on company time. All registered employees in the company can log in, submit 
 requests for reimbursement, and view their past tickets and pending requests. 
-Finance managers can log in, view all reimbursement requests, and past history for 
+Finance managers can log in, view all reimbursement requests, and past histories for 
 all employees in the company. They are also authorized to approve and deny 
 requests for expense reimbursement.
 
@@ -30,25 +30,25 @@ requests for expense reimbursement.
 - Java EE Servlets (Creates servlets for program and testing)
 - JSON Web Tokens (For authentication)
 - Apache Tomcat (Deploy webservlets)
-- JUnit (Testing)
+- Jenkins (Deploy WAR package to Apache)
 - Postman (Used for testing HTTPS requests)
 - Mockito (Mock Database Testing)
-- Jenkins (Deploy WAR package to Apache)
+- JUnit (Testing)
 - AWS (connect to EC2 machine for deployment)
 
 ### Relational Data Model
 ![Relational Model](https://github.com/220207-java-enterprise/assignments/blob/main/foundations-project/imgs/ERS%20Relational%20Model.png)
 
-##### Reimbursement Types
-- LODGING
-- TRAVEL
-- FOOD
-- OTHER
 ##### System Use Case Diagrams
 ![System Use Case Diagrams](https://raw.githubusercontent.com/220207-java-enterprise/assignments/main/foundations-project/imgs/ERS%20Use%20Case%20Diagram.png)
 
 ##### Reimbursment Status State Flow
 ![Reimbursment Status State Flow](https://raw.githubusercontent.com/220207-java-enterprise/assignments/main/foundations-project/imgs/ERS%20State%20Flow%20Diagram.png)
+##### Reimbursement Types
+- LODGING
+- TRAVEL
+- FOOD
+- OTHER
 ### HTTPS Processes and JSON structure
 - Follows RESTful architecture (level 2) using GET, POST, PUT, and DELETE methods. 
 - Leverages Postman for testing backend API requests using JSON objects
