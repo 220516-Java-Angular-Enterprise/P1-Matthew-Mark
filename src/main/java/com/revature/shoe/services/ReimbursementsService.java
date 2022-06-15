@@ -45,6 +45,7 @@ public class ReimbursementsService {
         ReimbursementsStatus reimbursementsStatus = new ReimbursementsStatus("1", "PENDING");
 
         //finishes reimbursements data
+        if(reimbursementRequest.getAmount() == null|| reimbursementRequest.getDescription() == null || reimbursementRequest.getPaymentID() == null || reimbursementRequest.getType() == null) throw new InvalidRequestException();
         Reimbursements reimbursements = reimbursementRequest.extractReimbursement();
         reimbursements.setReimbID(UUID.randomUUID().toString());
         reimbursements.setSubmitted(Timestamp.valueOf(LocalDateTime.now()));
@@ -100,7 +101,7 @@ public class ReimbursementsService {
 
         String sql = "";
         if(pending) sql += " r.status_id = '1'"; //Only returns status id of pending (1)
-        else sql += " r.status_id = '2' OR r.status_id = '3'";//Returns approved or denied status id (2,3)
+        else sql += " (r.status_id = '2' OR r.status_id = '3')";//Returns approved or denied status id (2,3)
         if(requester.getRole().equals("DEFAULT")) sql += " AND author_id = '" + requester.getId() + "'";
 
         sql += " ORDER BY " + sort.getColumnName();
@@ -132,10 +133,20 @@ public class ReimbursementsService {
                     sql += "'%" + key.getValue() + "%' AND";
                 }
             }
-            if (pending) sql += " r.status_id = '1'";
-            else sql += " r.status_id = '2' OR r.status_id = '3'";
-            if(requester.getRole().equals("DEFAULT")) sql += " AND author_id = '" + requester.getId() + "'";
-            else if(!pending) sql += " AND resolver_id = '" + requester.getId() + "'";
+
+            if(requester.getRole().equals("DEFAULT")) {
+                sql += " author_id = '" + requester.getId() + "' AND";
+            } else if(!pending && requester.getRole().equals("FMANAGER")){
+                sql += " resolver_id = '" + requester.getId() + "' AND";
+            }
+
+            if (pending) {
+                sql += " r.status_id = '1'";
+            }
+            else{
+                sql += " (r.status_id = '2' OR r.status_id = '3')";
+            }
+
             reimbursementsList = reimbursementsDAO.getFiltered(sql);
 
         } catch (Exception e) {

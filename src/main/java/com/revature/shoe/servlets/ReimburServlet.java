@@ -41,7 +41,35 @@ public class ReimburServlet extends HttpServlet {
     //todo  @ExtendWith(MockitoExtension.class) instead of @RunWith(MockitoJUnitRunner.class)
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        try {
+            Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
+            String[] uris = req.getRequestURI().split("/");
+
+            if (requester == null) {
+                resp.setStatus(401);
+                return;
+            }
+
+            if(uris.length == 4){
+                if(uris[3].equals("pending")){
+                    pendingActions(req, uris, requester, resp);
+                    return;
+                }
+                if(uris[3].equals("history")){
+                    historyActions(req, uris, requester, resp);
+                    return;
+                }
+            }
+
+        }catch (InvalidRequestException e) {
+            resp.setStatus(404); // BAD REQUEST
+        } catch (ResourceConflictException e) {
+            resp.setStatus(409); // RESOURCE CONFLICT
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(500);
+        }
+
         //todo do get gets all pending/ history depending on uri
     }
 
@@ -78,6 +106,7 @@ public class ReimburServlet extends HttpServlet {
             if (requester == null) {
                 resp.setStatus(401);
             }
+
 
             reimbursementsService.deleteReimbursement(updateReimbursement, requester);
 
@@ -150,6 +179,10 @@ public class ReimburServlet extends HttpServlet {
 
     private void pendingActions(HttpServletRequest req, String[] uris, Principal requester, HttpServletResponse resp) throws IOException {
         List<Reimbursements> pending = new ArrayList<>();
+        if(uris.length == 4){
+            ReimbursementFilter reimbursementFilter = new ReimbursementFilter();
+            pending = reimbursementsService.getReimbFilter(reimbursementFilter, requester, true);
+        }
         if(uris.length >= 5){
             if(uris[4].equals("sort")) {
                 ReimbursementSort reimbursementSort = objectMapper.readValue(req.getInputStream(), ReimbursementSort.class);
@@ -172,6 +205,11 @@ public class ReimburServlet extends HttpServlet {
 
     private void historyActions(HttpServletRequest req, String[] uris, Principal requester, HttpServletResponse resp) throws IOException{
         List<Reimbursements> history = new ArrayList<>();
+
+        if(uris.length == 4){
+            ReimbursementFilter reimbursementFilter = new ReimbursementFilter();
+            history = reimbursementsService.getReimbFilter(reimbursementFilter, requester, false);
+        }
         if(uris.length >= 5){
             if(uris[4].equals("sort")) {
                 ReimbursementSort reimbursementSort = objectMapper.readValue(req.getInputStream(), ReimbursementSort.class);
