@@ -102,4 +102,6 @@ public class UsersServicesTest {
         assertThrows(InvalidRequestException.class, () -> userservice.updateUserPassword(null,null));
 
     }
+
+
 }
